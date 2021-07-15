@@ -1,3 +1,7 @@
+import {useIndexedDB} from "./indexDB";
+
+console.log('Index DB', useIndexedDB);
+
 let transactions = [];
 let myChart;
 
