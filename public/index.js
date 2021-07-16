@@ -1,16 +1,38 @@
-import {useIndexedDB} from "./indexDB";
-
-console.log('Index DB', useIndexedDB);
+const { useIndexedDB } = require("./indexDB");
 
 let transactions = [];
 let myChart;
+//Check if user is online and MONGO database can be updated from cache
+
+if (window.navigator.onLine) {
+  //Check the Cache
+  useIndexedDB('budget', 'budget', 'get', '').then(results => {
+    results.forEach(budgetCache => {
+      fetch("/api/transaction", {
+        method: "POST",
+        body: JSON.stringify(budgetCache.budgetData),
+        headers: {
+          Accept: "application/json, text/plain, */*",
+          "Content-Type": "application/json"
+        }
+      })
+        .then(response => {
+          useIndexedDB('budget', 'budget', 'clear', budgetCache).then(results => {
+            console.log('Record cleared from INDEXDB');
+          });
+        })
+        .catch(err => {
+        });
+    });
+  });
+}
 
 fetch("/api/transaction")
   .then(response => {
     return response.json();
   })
   .then(data => {
-    // save db data on global variable
+    console.log('Index JS - fetch data from Mongo', data);
     transactions = data;
 
     populateTotal();
@@ -46,6 +68,8 @@ function populateTable() {
 
 function populateChart() {
   // copy array and reverse it
+  //const test = {'name':'coffee','value':10,'Date1':'2021-07015'};
+  //useIndexedDB('budget','budget','put', test); 
   let reversed = transactions.slice().reverse();
   let sum = 0;
 
@@ -70,14 +94,14 @@ function populateChart() {
 
   myChart = new Chart(ctx, {
     type: 'line',
-      data: {
-        labels,
-        datasets: [{
-            label: "Total Over Time",
-            fill: true,
-            backgroundColor: "#6666ff",
-            data
-        }]
+    data: {
+      labels,
+      datasets: [{
+        label: "Total Over Time",
+        fill: true,
+        backgroundColor: "#6666ff",
+        data
+      }]
     }
   });
 }
@@ -115,8 +139,7 @@ function sendTransaction(isAdding) {
   populateChart();
   populateTable();
   populateTotal();
-  
-  // also send to server
+
   fetch("/api/transaction", {
     method: "POST",
     body: JSON.stringify(transaction),
@@ -125,38 +148,35 @@ function sendTransaction(isAdding) {
       "Content-Type": "application/json"
     }
   })
-  .then(response => {    
-    return response.json();
-  })
-  .then(data => {
-    if (data.errors) {
-      errorEl.textContent = "Missing Information";
-    }
-    else {
+    .then(response => {
+      return response.json();
+    })
+    .then(data => {
+      if (data.errors) {
+        errorEl.textContent = "Missing Information";
+      }
+      else {
+        // clear form
+        nameEl.value = "";
+        amountEl.value = "";
+      }
+    })
+    .catch(err => {
+      // fetch failed, so save in indexed db
+      saveRecord(transaction);
+
       // clear form
       nameEl.value = "";
       amountEl.value = "";
-    }
-  })
-  .catch(err => {
-    // fetch failed, so save in indexed db
-    saveRecord(transaction);
-
-    // clear form
-    nameEl.value = "";
-    amountEl.value = "";
-  });
+    });
 }
-function saveRecord(transaction){
-  //Open a database in indexDB Should all modules which reference the indexDB in their own JS file 
-  //How is it retrieved when online comes back up.
-  //We need a manifest.webmanifest
-  //Need a service Worker - Does the service worker update the database when it comes online
+function saveRecord(transaction) {
+  useIndexedDB('budget', 'budget', 'put', transaction);
 }
-document.querySelector("#add-btn").onclick = function() {
+document.querySelector("#add-btn").onclick = function () {
   sendTransaction(true);
 };
 
-document.querySelector("#sub-btn").onclick = function() {
+document.querySelector("#sub-btn").onclick = function () {
   sendTransaction(false);
 };

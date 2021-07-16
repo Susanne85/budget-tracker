@@ -4,15 +4,15 @@ const DATA_CACHE_NAME = "data-cache-v1";
 const FILES_TO_CACHE = [
   "/",
   "/index.html",
-  "/manifest.webmanifest",
+  "/dist/manifest.json",
   "/styles.css",
-  "/index.js",
-  "/indexDB.js",
+  "/dist/bundle.js",
   "/icons/icon-192x192.png",
   "/icons/icon-512x512.png",
 ];
 
-// install
+// install  icons above need to be dits / is relative public
+//what is in dist is wbat is needed to run in browser
 self.addEventListener("install", function (evt) {
   evt.waitUntil(
     caches.open(CACHE_NAME).then(cache => {

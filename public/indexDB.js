@@ -1,5 +1,5 @@
-
-export function useIndexedDB(databaseName, storeName, method, object) {
+const { v4: uuidv4 } = require('uuid');
+function useIndexedDB(databaseName, storeName, method, object) {
 
     return new Promise((resolve, reject) => {
         const request = window.indexedDB.open(databaseName, 1);
@@ -10,21 +10,21 @@ export function useIndexedDB(databaseName, storeName, method, object) {
             db.createObjectStore(storeName, { keyPath: "_id" });
         };
 
-        request.onsuccess = event => {
+        request.onerror = (event) => {
+            console.log('IndexDB had an error', event);
+          };
+        request.onsuccess = (event) => {
             //Setup a transaction store
-            db = request.result;
-            const budgetTransaction = db.transaction([storeName, "readwrite");
+            db = event.target.result;
+            
+            const budgetTransaction = db.transaction([storeName], "readwrite");
             store = budgetTransaction.objectStore(storeName);
 
-            //now add data
-            db.onerror = function (e) {
-                console.log("error");
-            };
             if (method === "put") {
-                store.put(object);
+               store.put({_id:uuidv4(), budgetData: object});
             }
             if (method === "clear") {
-                store.clear();
+                store.clear(object);
             }
             if (method === "get") {
                 const all = store.getAll();
@@ -39,3 +39,4 @@ export function useIndexedDB(databaseName, storeName, method, object) {
     });
 }
 
+ module.exports = {useIndexedDB}
