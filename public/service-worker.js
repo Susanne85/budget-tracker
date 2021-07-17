@@ -7,7 +7,6 @@ const FILES_TO_CACHE = [
   "/manifest.webmanifest.json",
   "/styles.css",
   "/index.js",
-  "/indexDB.js",
   "/icons/icon-192x192.png",
   "/icons/icon-512x512.png",
 ];
@@ -17,7 +16,7 @@ const FILES_TO_CACHE = [
 self.addEventListener("install", function (evt) {
   evt.waitUntil(
     caches.open(CACHE_NAME).then(cache => {
-      console.log("Susanne Your files were pre-cached successfully!");
+      console.log("Your files were pre-cached successfully!");
       return cache.addAll(FILES_TO_CACHE);
     })
   );

@@ -11,7 +11,7 @@ function useIndexedDB(databaseName, storeName, method, object) {
 
       request.onupgradeneeded = ({ event }) => {
           db = request.result;
-          db.createObjectStore(storeName, { keyPath: "_id" });
+          db.createObjectStore(storeName, { keyPath: "_id", autoIncrement:true});
       };
 
       request.onerror = (event) => {
@@ -25,7 +25,7 @@ function useIndexedDB(databaseName, storeName, method, object) {
           store = budgetTransaction.objectStore(storeName);
 
           if (method === "put") {
-             store.put({_id:uuidv4(), budgetData: object});
+             store.put({budgetData: object});
           }
           if (method === "clear") {
               store.clear(object);
@@ -70,7 +70,6 @@ fetch("/api/transaction")
     return response.json();
   })
   .then(data => {
-    console.log('Index JS - fetch data from Mongo', data);
     transactions = data;
 
     populateTotal();
