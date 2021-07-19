@@ -1,47 +1,9 @@
-//const { useIndexedDB } = require("./indexDB");
+const { useIndexedDB } = require("./indexDB");
 
 let transactions = [];
 let myChart;
 //Check if user is online and MONGO database can be updated from cache
-function useIndexedDB(databaseName, storeName, method, object) {
 
-  return new Promise((resolve, reject) => {
-      const request = window.indexedDB.open(databaseName, 1);
-      let db, store;
-
-      request.onupgradeneeded = ({ event }) => {
-          db = request.result;
-          db.createObjectStore(storeName, { keyPath: "_id", autoIncrement:true});
-      };
-
-      request.onerror = (event) => {
-          console.log('IndexDB had an error', event);
-        };
-      request.onsuccess = (event) => {
-          //Setup a transaction store
-          db = event.target.result;
-          
-          const budgetTransaction = db.transaction([storeName], "readwrite");
-          store = budgetTransaction.objectStore(storeName);
-
-          if (method === "put") {
-             store.put({budgetData: object});
-          }
-          if (method === "clear") {
-              store.clear(object);
-          }
-          if (method === "get") {
-              const all = store.getAll();
-              all.onsuccess = function () {
-                  resolve(all.result);
-              };
-          }
-          budgetTransaction.oncomplete = function () {
-              db.close();
-          };
-      };
-  });
-}
 if (window.navigator.onLine) {
   //Check the Cache
   useIndexedDB('budget', 'budget', 'get', '').then(results => {
@@ -70,6 +32,7 @@ fetch("/api/transaction")
     return response.json();
   })
   .then(data => {
+    console.log('Index JS - fetch data from Mongo', data);
     transactions = data;
 
     populateTotal();
