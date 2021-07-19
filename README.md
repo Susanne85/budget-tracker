@@ -41,6 +41,10 @@ npm start
 ```
 To execute the application on Heroku requires configuration variables for the connection to MongoDb to be added.  Login to Heroku and then click on the Settings tab and then click on the Config vars and then add a key value pair,  the key is 'MONGODB_URI', the value is mongodb+srv://your mongo user name:your mongo Atlas password@cluster0.hnbwz.mongodb.net/your database name?retryWrites=true&w=majority'.  Replace the variables as described above.
 
+## To create a Progressive Web Application
+
+In Google Chrome, open the application Budget Tracker (https://susannes-budget-tracker.herokuapp.com/) and in the address bar if there is an icon which when you hover over it says 'Install Budget App' then click on it otherwise click on the three vertical dot on the top right hand side of the screen and save the application, this will save the application to your device. 
+
 ## Assets
 
 Live demo of the application hosted on Heroku:  Budget Tracker](https://susannes-budget-tracker.herokuapp.com/)

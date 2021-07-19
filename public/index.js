@@ -22,6 +22,7 @@ if (window.navigator.onLine) {
           });
         })
         .catch(err => {
+          console.log('Unable to update Database', err);
         });
     });
   });
@@ -163,15 +164,12 @@ function sendTransaction(isAdding) {
     })
     .catch(err => {
       // fetch failed, so save in indexed db
-      saveRecord(transaction);
+      useIndexedDB('budget', 'budget', 'put', transaction);
 
       // clear form
       nameEl.value = "";
       amountEl.value = "";
     });
-}
-function saveRecord(transaction) {
-  useIndexedDB('budget', 'budget', 'put', transaction);
 }
 document.querySelector("#add-btn").onclick = function () {
   sendTransaction(true);
